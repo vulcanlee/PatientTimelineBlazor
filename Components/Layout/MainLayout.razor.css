@@ -1,0 +1,24 @@
+.page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    color: #222;
+}
+
+.top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: #1f3b73;
+    color: white;
+}
+
+.top-row a {
+    color: #d2e4ff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+main {
+    padding: 1.5rem 2rem 2rem;
+}
