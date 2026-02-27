@@ -1,0 +1,19 @@
+<button class="event-card @Event.ResourceType.ToLowerInvariant()" @onclick="() => OnSelected.InvokeAsync(Event)">
+    <div class="event-date">@Event.OccurredAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm")</div>
+    <div class="event-content">
+        <strong>@Event.ResourceType</strong>
+        <div>@Event.Title</div>
+        @if (!string.IsNullOrWhiteSpace(Event.OrganizationDisplay))
+        {
+            <small>Organization: @Event.OrganizationDisplay</small>
+        }
+    </div>
+</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public required TimelineEvent Event { get; set; }
+
+    [Parameter]
+    public EventCallback<TimelineEvent> OnSelected { get; set; }
+}
