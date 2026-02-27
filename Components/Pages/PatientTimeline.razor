@@ -12,11 +12,11 @@
     </label>
     <label>
         From
-        <input type="date" @bind="FromDateText" />
+        <InputDate TValue="DateTime?" @bind-Value="FromDate" />
     </label>
     <label>
         To
-        <input type="date" @bind="ToDateText" />
+        <InputDate TValue="DateTime?" @bind-Value="ToDate" />
     </label>
     <button @onclick="LoadTimelineAsync" disabled="@IsLoading">@(IsLoading ? "Loading..." : "Search")</button>
 </div>
@@ -46,8 +46,8 @@
 
 @code {
     private string PatientId { get; set; } = "129c6ac7-8d06-89de-ad63-0204a93e76c3";
-    private string? FromDateText { get; set; }
-    private string? ToDateText { get; set; }
+    private DateTime? FromDate { get; set; }
+    private DateTime? ToDate { get; set; }
     private bool IsLoading { get; set; }
     private string? ErrorMessage { get; set; }
     private PatientTimelineResult? Result { get; set; }
@@ -67,8 +67,8 @@
         try
         {
             IsLoading = true;
-            var from = DateOnly.TryParse(FromDateText, out var fromValue) ? fromValue : null;
-            var to = DateOnly.TryParse(ToDateText, out var toValue) ? toValue : null;
+            var from = FromDate.HasValue ? DateOnly.FromDateTime(FromDate.Value) : (DateOnly?)null;
+            var to = ToDate.HasValue ? DateOnly.FromDateTime(ToDate.Value) : (DateOnly?)null;
             Result = await FhirDataService.GetTimelineAsync(PatientId.Trim(), from, to);
         }
         catch (Exception ex)
