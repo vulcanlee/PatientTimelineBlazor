@@ -1,0 +1,40 @@
+@if (SelectedEvent is null)
+{
+    <aside class="detail-panel empty">Select an event to view details.</aside>
+}
+else
+{
+    <aside class="detail-panel">
+        <h3>@SelectedEvent.ResourceType</h3>
+        <p><strong>Title:</strong> @SelectedEvent.Title</p>
+        <p><strong>Date:</strong> @SelectedEvent.OccurredAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
+        @if (!string.IsNullOrWhiteSpace(SelectedEvent.EncounterId))
+        {
+            <p><strong>Encounter ID:</strong> @SelectedEvent.EncounterId</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(SelectedEvent.OrganizationDisplay))
+        {
+            <p><strong>Organization:</strong> @SelectedEvent.OrganizationDisplay</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(SelectedEvent.PractitionerDisplay))
+        {
+            <p><strong>Practitioner:</strong> @SelectedEvent.PractitionerDisplay</p>
+        }
+
+        @if (SelectedEvent.Details.Count > 0)
+        {
+            <h4>Additional Details</h4>
+            <ul>
+                @foreach (var detail in SelectedEvent.Details)
+                {
+                    <li><strong>@detail.Key:</strong> @detail.Value</li>
+                }
+            </ul>
+        }
+    </aside>
+}
+
+@code {
+    [Parameter]
+    public TimelineEvent? SelectedEvent { get; set; }
+}

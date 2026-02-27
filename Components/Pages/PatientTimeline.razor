@@ -1,0 +1,88 @@
+@page "/patient-timeline"
+@inject IFhirDataService FhirDataService
+
+<PageTitle>Patient Timeline</PageTitle>
+
+<h1>Patient Timeline</h1>
+
+<div class="query-panel">
+    <label>
+        Patient ID
+        <input @bind="PatientId" placeholder="129c6ac7-8d06-89de-ad63-0204a93e76c3" />
+    </label>
+    <label>
+        From
+        <input type="date" @bind="FromDateText" />
+    </label>
+    <label>
+        To
+        <input type="date" @bind="ToDateText" />
+    </label>
+    <button @onclick="LoadTimelineAsync" disabled="@IsLoading">@(IsLoading ? "Loading..." : "Search")</button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <p class="error">@ErrorMessage</p>
+}
+
+@if (Result is not null)
+{
+    <section class="summary-panel">
+        <h2>Patient Summary</h2>
+        <p><strong>ID:</strong> @Result.Summary.PatientId</p>
+        <p><strong>Name:</strong> @(Result.Summary.Name ?? "N/A")</p>
+        <p><strong>Gender:</strong> @(Result.Summary.Gender ?? "N/A")</p>
+        <p><strong>BirthDate:</strong> @(Result.Summary.BirthDate?.ToString("yyyy-MM-dd") ?? "N/A")</p>
+        <p><strong>Encounter Count:</strong> @(Result.Summary.EncounterCount?.ToString() ?? "0")</p>
+        <p><strong>Latest Encounter:</strong> @(Result.Summary.LatestEncounterDate?.LocalDateTime.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</p>
+    </section>
+
+    <section class="content-grid">
+        <TimelineView Events="Result.Events" OnEventSelected="OnEventSelected" />
+        <EncounterDetailPanel SelectedEvent="SelectedEvent" />
+    </section>
+}
+
+@code {
+    private string PatientId { get; set; } = "129c6ac7-8d06-89de-ad63-0204a93e76c3";
+    private string? FromDateText { get; set; }
+    private string? ToDateText { get; set; }
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+    private PatientTimelineResult? Result { get; set; }
+    private TimelineEvent? SelectedEvent { get; set; }
+
+    private async Task LoadTimelineAsync()
+    {
+        ErrorMessage = null;
+        SelectedEvent = null;
+
+        if (string.IsNullOrWhiteSpace(PatientId))
+        {
+            ErrorMessage = "Please provide a patient ID.";
+            return;
+        }
+
+        try
+        {
+            IsLoading = true;
+            var from = DateOnly.TryParse(FromDateText, out var fromValue) ? fromValue : null;
+            var to = DateOnly.TryParse(ToDateText, out var toValue) ? toValue : null;
+            Result = await FhirDataService.GetTimelineAsync(PatientId.Trim(), from, to);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void OnEventSelected(TimelineEvent timelineEvent)
+    {
+        SelectedEvent = timelineEvent;
+    }
+}

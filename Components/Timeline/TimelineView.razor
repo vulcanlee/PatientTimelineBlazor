@@ -1,0 +1,21 @@
+@if (Events.Count == 0)
+{
+    <p>No timeline events in current range.</p>
+}
+else
+{
+    <div class="timeline">
+        @foreach (var timelineEvent in Events)
+        {
+            <TimelineEventCard Event="timelineEvent" OnSelected="OnEventSelected" />
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<TimelineEvent> Events { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<TimelineEvent> OnEventSelected { get; set; }
+}
